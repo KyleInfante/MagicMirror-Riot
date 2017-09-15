@@ -1,10 +1,10 @@
 {
-  "api-key": "",
+  "api-key": "<<API Key from https://developer.riotgames.com>>",
 
-  "summoner-name": "",
+  "summoner-name": "<<Summoner Name>>",
 
-  "num-matches": "",
+  "num-matches": "<<Number of matches to list; 1-20>>",
 
-  "only-ranked": ""
+  "only-ranked": "<<Show only ranked games; true or false>>"
 
 }

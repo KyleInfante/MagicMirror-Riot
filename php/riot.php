@@ -47,7 +47,7 @@ class Riot
 
     private function getConfigs()
     {
-        $jsonObj = $this->getJsonObj(ROOT_PATH.$this->configsPath);
+        $jsonObj = $this->getJsonObj(ROOT_PATH.$this->configsPath, false);
         $this->apiKey =  $jsonObj['api-key'];
         $this->summoner = $jsonObj['summoner-name'];
         $this->numMatches = $jsonObj['num-matches'];
@@ -59,14 +59,14 @@ class Riot
     private function getAccountId()
     {
        $uri = $this->summonerUri . $this->uriAuth;
-       $jsonObj = $this->getJsonObj($uri);
+       $jsonObj = $this->getJsonObj($uri, true);
        $this->accountId = $jsonObj['accountId'];
     }
 
     private function getMatchData()
     {
         $uri = $this->matchListUri_s . $this->accountId . $this->matchListUri_e . $this->uriAuth;
-        $jsonObj = $this->getJsonObj($uri);
+        $jsonObj = $this->getJsonObj($uri, true);
         $this->getGameIds($jsonObj);
         $this->getMatches();
     }
@@ -115,28 +115,67 @@ class Riot
 
     private function getMatches()
     {
+        $mh = curl_multi_init();
+        $requests = array();
+
         for($i = 0; $i < count($this->gameIds); $i++)
         {
             $uri = $this->matchUri . $this->gameIds[$i] . $this->uriAuth;
-            $jsonObj = $this->getJsonObj($uri);
+            $ch = curl_init($uri);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_multi_add_handle($mh, $ch);
+            array_push($requests, $ch);
+        }
+
+        $running = null;
+        do
+        {
+            curl_multi_exec($mh, $running);
+        }while($running);
+
+        for($j = 0; $j < count($requests); $j++)
+        {
+            curl_multi_remove_handle($mh, $requests[$j]);
+            $content = curl_multi_getcontent($requests[$j]);
+            $jsonObj = json_decode($content, true);
             array_push($this->matches, $jsonObj);
         }
+        curl_multi_close($mh);
     }
 
     private function getStaticData()
     {
-        $this->version = $this->getJsonObj($this->versionsUri)[0];
+        $this->version = $this->getJsonObj($this->versionsUri, true)[0];
         $this->championsDataPath = "http://ddragon.leagueoflegends.com/cdn/" .$this->version. "/data/en_US/champion.json";
         $this->itemsDataPath = "http://ddragon.leagueoflegends.com/cdn/" .$this->version. "/data/en_US/item.json";
         $this->spellsDataPath = "http://ddragon.leagueoflegends.com/cdn/" .$this->version. "/data/en_US/summoner.json";
-        $this->championsData = $this->getJsonObj($this->championsDataPath)["data"];
-        $this->itemsData = $this->getJsonObj($this->itemsDataPath)["data"];
-        $this->spellsData = $this->getJsonObj($this->spellsDataPath)["data"];
+        $this->championsData = $this->getJsonObj($this->championsDataPath, true)["data"];
+        $this->itemsData = $this->getJsonObj($this->itemsDataPath, true)["data"];
+        $this->spellsData = $this->getJsonObj($this->spellsDataPath, true)["data"];
     }
 
-    private function getJsonObj($path)
+    private function getJsonObj($path, $web)
     {
-        $contents = file_get_contents($path);
+        if($web)
+        {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $path);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            $contents = curl_exec($ch);
+            curl_close($ch);
+        }
+        else
+        {
+            //if its a file
+            $contents = file_get_contents($path);
+        }
+
         $jsonObj = json_decode($contents, true);
         return $jsonObj;
     }
