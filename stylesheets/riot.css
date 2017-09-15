@@ -1,0 +1,101 @@
+*{
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: white;
+}
+
+body{
+    background-color: #666666;
+}
+
+.match-container{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    width: 800px;
+    height: 100px;
+    border: 1px solid white;
+    margin: 5px;
+}
+
+.win-loss {
+    font-size: 5em;
+    border-right: 1px solid white;
+    width: 80px;
+    padding: 5px;
+    text-align: center;
+}
+
+.champion-info{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    margin: 0 10px;
+}
+
+.champ-name{
+    font-weight: bold;
+    font-size: 1.75em;
+    margin: 7px 0;
+}
+
+.kda-container{
+    margin: auto 5px;
+    width: 275px;
+}
+
+.kda{
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.calc{
+    text-align: center;
+    font-size: 0.8em;
+}
+
+.items{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    width: 180px;
+    margin: auto;
+}
+
+.item{
+    font-size: .73em;
+    margin: 0.5px 1px;
+    border: 1px solid #aaaaaa;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.teams{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    /*height: 100px;*/
+    font-size: 0.85em;
+    width: 200px;
+    margin: 0px 10px;
+}
+
+.summoner{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    height: 20px;
+    text-align: left;
+    /*width: 100px;*/
+}
+
+.champ{
+    width: 80px;
+    padding: 2px;
+}
+
+.summoner-name{
+    /*width: 100px;*/
+    padding: 2px;
+}
+
